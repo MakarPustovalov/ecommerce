@@ -1,3 +1,4 @@
+const ApiError = require('../errors/ApiError')
 class UserController {
 
   async register(req, res) {
@@ -8,8 +9,12 @@ class UserController {
     res.send({msg: 'login'})
   }
 
-  async check(req, res) {
-    res.send({msg: 'check'})
+  async check(req, res, next) {
+    let query = req.query
+    if (!query.id) {
+      return next(ApiError.badRequest('Id is not provided'))
+    }
+    res.json({query})
   }
 
 }
