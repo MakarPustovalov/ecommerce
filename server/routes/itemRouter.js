@@ -1,6 +1,10 @@
 const express = require('express')
 const router = express.Router()
+const ItemController = require('../controllers/ItemController')
 
-router.get('/', (req, res) => res.send({msg: 'item'}))
+router.get('/', ItemController.get)
+router.post('/', ItemController.create)
+router.put('/', ItemController.update)
+router.delete('/', ItemController.delete)
 
 module.exports = router

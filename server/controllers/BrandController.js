@@ -23,6 +23,22 @@ class BrandController {
     }
   }
 
+  async getOne (req, res, next) {
+    try {
+
+      let {name} = req.query
+      if (!name) return next(ApiError.badRequest('Name is not provided'))
+
+      let result = await BrandModel.findOne({name})
+      if (!result) return next(ApiError.notFound('Brand with this name not found'))
+      return res.json({success: true, result: result})
+
+    } catch (error) {
+      console.log(error)
+      return next(ApiError.internalError('Something went wrong'))
+    }
+  }
+
   async getAll (req, res, next) {
     try {
 
