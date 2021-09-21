@@ -1,14 +1,15 @@
 require('dotenv').config()
-const express = require('express')
-const config = require('./config')
-const mongoose = require('mongoose')
+const express        = require('express')
+const config         = require('./config')
+const mongoose       = require('mongoose')
 const errorHandlerMW = require('./middleware/errorHandlerMW')
-const homeRouter = require('./routes')
+const homeRouter     = require('./routes')
 
 const PORT = process.env.PORT || config.port
 
 const app = express()
 
+app.use(express.json())
 app.use('/', homeRouter)
 
 // Error handling

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose')
 const { Schema, model } = mongoose;
 
 const itemSchema = new Schema({
@@ -10,6 +10,7 @@ const itemSchema = new Schema({
     type: Number,
     required: true
   },
+  brand: {type: Schema.Types.ObjectId, ref: 'Brands'}
 });
 
 const itemModel = model('Item', itemSchema)
