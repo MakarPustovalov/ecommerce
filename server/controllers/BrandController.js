@@ -26,11 +26,15 @@ class BrandController {
   async get (req, res, next) {
     try {
 
-      let {name} = req.query
+      let {name, id} = req.query
 
       if (name) {
         let result = await BrandModel.findOne({name})
         if (!result) return next(ApiError.notFound('Brand with this name not found'))
+        return res.json({success: true, result})
+      } else if (id) {
+        let result = await BrandModel.findById(id)
+        if (!result) return next(ApiError.notFound('Brand with this id not found'))
         return res.json({success: true, result})
       } else {
         let result = await BrandModel.find({})

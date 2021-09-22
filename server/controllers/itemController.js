@@ -38,7 +38,10 @@ class ItemController {
   async get (req, res, next) {
     try {
 
-      let {name} = req.query
+      let {name, brandId, limit, page} = req.query
+      page = +page || 1
+      limit = +limit || 10
+      let offset = limit * page - limit
 
       if (name) {
 
@@ -46,11 +49,28 @@ class ItemController {
         if (!result) return next(ApiError.notFound('Item with this name not found'))
         return res.json({success: true, result})
 
+      } else if (!name && brandId) {
+
+        let result = await ItemModel.find({brand: brandId}).limit(limit).skip(offset)
+        if (!result) return next(ApiError.internalError('Something went wrong'))
+        return res.json({success: true, result: {
+          result,
+          totalItems,
+          page,
+          limit
+        }})
+
       } else {
 
-        let result = await ItemModel.find({})
+        let totalItems = await ItemModel.find({}).count()
+        let result = await ItemModel.find({}).limit(limit).skip(offset)
         if (!result) return next(ApiError.internalError('Something went wrong'))
-        return res.json({success: true, result})
+        return res.json({success: true, result: {
+          result,
+          totalItems,
+          page,
+          limit
+        }})
 
       }
 
