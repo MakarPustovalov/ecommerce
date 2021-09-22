@@ -2,14 +2,18 @@ require('dotenv').config()
 const express        = require('express')
 const config         = require('./config')
 const mongoose       = require('mongoose')
+const fileUpload     = require('express-fileupload')
 const errorHandlerMW = require('./middleware/errorHandlerMW')
 const homeRouter     = require('./routes')
+const path           = require('path')
 
 const PORT = process.env.PORT || config.port
 
 const app = express()
 
 app.use(express.json())
+app.use('static', express.static(path.resolve(__dirname, 'static')))
+app.use(fileUpload({}))
 app.use('/', homeRouter)
 
 // Error handling

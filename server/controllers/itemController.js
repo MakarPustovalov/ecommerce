@@ -1,21 +1,28 @@
 const ItemModel = require('../model/itemModel')
-const ApiError   = require('../errors/ApiError')
+const ApiError  = require('../errors/ApiError')
+const uuid      = require('uuid')
+const path      = require('path')
 class ItemController {
 
   async create(req, res, next) {
     try {
 
-      const {name, cost, brandId, img} = req.body
+      const {name, cost, brandId} = req.body
+      const {img} = req.files
+
       if (!name) return next(ApiError.badRequest('Name is not provided'))
       if (!cost) return next(ApiError.badRequest('Cost is not provided'))
 
       let duplicate = await ItemModel.findOne({name})
       if (duplicate) return next(ApiError.badRequest('Item with this name already excists'))
 
+      const fileName = uuid.v4() + '.jpg'
+      img.mv(path.resolve(__dirname, '..', 'static', fileName))
+
       let item = await new ItemModel({
         name,
         cost,
-        img,
+        img: fileName,
         brand: brandId
       })
       item = await item.save()
