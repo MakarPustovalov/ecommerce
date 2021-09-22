@@ -54,7 +54,7 @@ class ItemController {
         let result = await ItemModel.find({brand: brandId}).limit(limit).skip(offset)
         if (!result) return next(ApiError.internalError('Something went wrong'))
         return res.json({success: true, result: {
-          result,
+          data: result,
           totalItems,
           page,
           limit
@@ -66,7 +66,7 @@ class ItemController {
         let result = await ItemModel.find({}).limit(limit).skip(offset)
         if (!result) return next(ApiError.internalError('Something went wrong'))
         return res.json({success: true, result: {
-          result,
+          data: result,
           totalItems,
           page,
           limit
