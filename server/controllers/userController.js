@@ -1,7 +1,9 @@
 const ApiError    = require('../errors/ApiError')
 const { findOne } = require('../model/userModel')
 const UserModel   = require('../model/userModel')
+const token       = require('../helpers/token')
 const bcrypt      = require('bcrypt')
+const config      = require('../config')
 class UserController {
 
   async register(req, res, next) {
@@ -31,9 +33,23 @@ class UserController {
       user = await user.save()
       if (!user) return next(ApiError.internalError('Something went wrong'))
 
-      return res.send({
-        success: true
+      let payload = {
+        email: user.email,
+        role: user.role
+      }
+
+      const accessToken = token.create(payload)
+
+      return res
+      .cookie('access', accessToken, {
+        maxAge: 900000,
+        httpOnly: true,
+        signed: true,
+        domain: config.domain,
+        sameSite: process.env.MODE === 'production' ? 'none' : 'lax',
+        secure: process.env.MODE === 'production' ? true : false
       })
+      .json({success: true, result: payload})
       
     } catch (error) {
       console.log(error)
@@ -57,9 +73,23 @@ class UserController {
       let isPasswordCorrect = bcrypt.compareSync(password, user.password);
       if (!isPasswordCorrect) return next(ApiError.badRequest('Password is not correct'))
 
-      return res.send({
-        success: true
+      let payload = {
+        email: user.email,
+        role: user.role
+      }
+
+      const accessToken = token.create(payload)
+
+      return res
+      .cookie('access', accessToken, {
+        maxAge: 900000,
+        httpOnly: true,
+        signed: true,
+        domain: config.domain,
+        sameSite: process.env.MODE === 'production' ? 'none' : 'lax',
+        secure: process.env.MODE === 'production' ? true : false
       })
+      .json({success: true, result: payload})
       
     } catch (error) {
       console.log(error)
@@ -67,17 +97,23 @@ class UserController {
     }
   }
 
-  async getProfile(req, res, next) {
-    res.send({msg: 'profile'})
+  async check(req, res, next) {
+    try {
+      let {access} = req.signedCookies
+      if (!access) return next(ApiError.badRequest('Token is not provided'))
+
+      let payload = token.verify(access)
+      if (!payload) return next(ApiError.badRequest('Invalid token'))
+
+      return res.json({success: true, result: payload})
+      
+    } catch (error) {
+      console.log(error)
+      return next(ApiError.internalError('Something went wrong'))
+    }
   }
 
-  async check(req, res, next) {
-    let query = req.query
-    if (!query.id) {
-      return next(ApiError.badRequest('Id is not provided'))
-    }
-    res.json({query})
-  }
+  // Technical endpoint - comment out if production
 
   async delete(req, res, next) {
     try {

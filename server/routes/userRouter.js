@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const UserController = require('../controllers/userController')
 
-router.get('/profile', UserController.getProfile)
 router.post('/register', UserController.register)
 router.delete('/delete', UserController.delete)
 router.post('/login', UserController.login)
